@@ -389,7 +389,6 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     if not unvisited:
         return 0
 
-    # Heurystyka: maksymalny dystans Manhattan do nieodwiedzonego narożnika
     distances = [abs(position[0] - c[0]) + abs(position[1] - c[1]) for c in unvisited]
     return max(distances)
 
@@ -485,7 +484,23 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    foodList = foodGrid.asList()
+    if not foodList:
+        return 0
+
+    if 'distances' not in problem.heuristicInfo:
+        problem.heuristicInfo['distances'] = {}
+
+    maxDistance = 0
+    for food in foodList:
+        key = (position, food)
+        if key not in problem.heuristicInfo['distances']:
+            problem.heuristicInfo['distances'][key] = mazeDistance(position, food, problem.startingGameState)
+        dist = problem.heuristicInfo['distances'][key]
+        if dist > maxDistance:
+            maxDistance = dist
+
+    return maxDistance
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
